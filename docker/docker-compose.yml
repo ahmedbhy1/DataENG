@@ -30,6 +30,7 @@ services:
     environment:
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://postgres:postgres@postgres:5432/imdb_reddit
+      PYTHONPATH: /opt/airflow/dags:/opt/airflow/etl
     depends_on:
       - postgres
     ports:
@@ -37,8 +38,11 @@ services:
     volumes:
       - ./dags:/opt/airflow/dags
       - ./etl:/opt/airflow/etl
+      - ./requirements.txt:/requirements.txt
     entrypoint: >
       bash -c "
+        echo 'Installing dependencies...';
+        pip install --no-cache-dir -r /requirements.txt;
         echo 'Waiting for Postgres...';
         until pg_isready -h postgres -p 5432; do sleep 2; done;
         airflow db upgrade;
