@@ -1,7 +1,11 @@
-from etl.extract import get_film_data
-from etl.reddit_extract import get_reddit_comments
-from etl.sentiment import compute_sentiment
-from etl.load import load_dim_film, load_dim_actor, load_fact
+
+
+
+from docker.etl.extract import get_film_data
+from docker.etl.load import load_dim_actor, load_dim_film
+from docker.etl.reddit_extract import get_reddit_comments
+from docker.etl.sentiment import compute_sentiment
+
 
 movies = ["Inception", "Interstellar", "The Matrix"]
 

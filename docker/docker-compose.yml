@@ -11,6 +11,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./requirements.txt:/requirements.txt
 
   pgadmin:
     image: dpage/pgadmin4:7
@@ -34,8 +35,8 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ../dags:/opt/airflow/dags
-      - ../etl:/opt/airflow/etl
+      - ./dags:/opt/airflow/dags
+      - ./etl:/opt/airflow/etl
     entrypoint: >
       bash -c "
         echo 'Waiting for Postgres...';

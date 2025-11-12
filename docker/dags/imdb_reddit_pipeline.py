@@ -1,7 +1,7 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime
-from etl.main import run_pipeline
+from main import run_pipeline  
 
 with DAG("imdb_reddit_pipeline",
          start_date=datetime(2025,1,1),
