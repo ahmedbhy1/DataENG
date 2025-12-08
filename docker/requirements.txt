@@ -1,2 +1,11 @@
-imdbpy
-praw
+﻿imdbpy==2022.7.9
+praw==7.7.0
+pandas==1.5.3
+sqlalchemy==1.4.48
+psycopg2-binary==2.9.9
+python-dotenv==1.0.0
+textblob==0.17.1
+beautifulsoup4==4.12.2
+requests==2.31.0
+flask==2.2.5
+werkzeug==2.2.2

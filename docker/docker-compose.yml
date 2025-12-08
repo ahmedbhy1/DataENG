@@ -1,4 +1,4 @@
-services:
+﻿services:
   postgres:
     image: postgres:15
     container_name: imdb_postgres
@@ -11,7 +11,11 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./requirements.txt:/requirements.txt
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   pgadmin:
     image: dpage/pgadmin4:7
@@ -22,7 +26,8 @@ services:
     ports:
       - "5050:80"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   airflow:
     image: apache/airflow:2.7.2
@@ -30,27 +35,28 @@ services:
     environment:
       AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://postgres:postgres@postgres:5432/imdb_reddit
-      PYTHONPATH: /opt/airflow/dags:/opt/airflow/etl
+      PYTHONPATH: /opt/airflow/dags
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: imdb_reddit
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     ports:
       - "8080:8080"
+      - "5000:5000"
     volumes:
       - ./dags:/opt/airflow/dags
-      - ./etl:/opt/airflow/etl
       - ./requirements.txt:/requirements.txt
-    entrypoint: >
+    command: >
       bash -c "
-        echo 'Installing dependencies...';
-        pip install --no-cache-dir -r /requirements.txt;
-        echo 'Waiting for Postgres...';
-        until pg_isready -h postgres -p 5432; do sleep 2; done;
-        airflow db upgrade;
-        airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com --force;
-        airflow scheduler &
-        airflow webserver
+        pip install --no-cache-dir -r /requirements.txt &&
+        airflow db upgrade &&
+        airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com 2>/dev/null || true &&
+        airflow standalone
       "
 
 volumes:
   postgres_data:
-
