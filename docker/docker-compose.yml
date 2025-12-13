@@ -50,6 +50,7 @@
     volumes:
       - ./dags:/opt/airflow/dags
       - ./requirements.txt:/requirements.txt
+      - ./init.sql:/opt/airflow/init.sql
     command: >
       bash -c "
         pip install --no-cache-dir -r /requirements.txt &&
