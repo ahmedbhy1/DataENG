@@ -143,9 +143,9 @@ def _fetch_from_imdb_top_movies(limit=5):
 def _fetch_from_omdb(limit=5):
     """Fetch real movies using public movie APIs and data"""
     try:
-        logger.info("Fetching from popular movie sources...")
+        logger.info("Fetching from TV Maze API with cast information...")
         
-        # Use an alternative free API for movie data
+        # Use TV Maze API for movie/show data with cast
         url = "https://api.tvmaze.com/shows"
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
         
@@ -159,15 +159,36 @@ def _fetch_from_omdb(limit=5):
                 try:
                     # Filter for movies/shows with high ratings
                     if show.get('rating', {}).get('average', 0) >= 7.0:
+                        show_id = show.get('id', 'unknown')
+                        
+                        # Fetch cast information for this show
+                        actors = []
+                        try:
+                            cast_url = f"https://api.tvmaze.com/shows/{show_id}/cast"
+                            cast_response = requests.get(cast_url, headers=headers, timeout=10)
+                            
+                            if cast_response.status_code == 200:
+                                cast_data = cast_response.json()
+                                # Get top 5 actors
+                                actors = [member.get('person', {}).get('name', 'Unknown') 
+                                         for member in cast_data[:5] 
+                                         if 'person' in member and 'name' in member.get('person', {})]
+                        except Exception as e:
+                            logger.debug(f"Failed to fetch cast for {show.get('name')}: {e}")
+                        
+                        # Fallback if no cast found
+                        if not actors:
+                            actors = ['Unknown'] * 5
+                        
                         movie = {
-                            'imdb_id': f"tvmaze_{show.get('id', 'unknown')}",
+                            'imdb_id': f"tvmaze_{show_id}",
                             'title': show.get('name', 'Unknown'),
                             'rating': show.get('rating', {}).get('average', 7.5),
                             'year': int(show.get('premiered', '2025')[:4]) if show.get('premiered') else 2025,
-                            'actors': ['Unknown'] * 5
+                            'actors': actors[:5]
                         }
                         movies.append(movie)
-                        logger.info(f"✓ Found: {movie['title']} ({movie['rating']}/10) - {movie['year']}")
+                        logger.info(f"✓ Found: {movie['title']} ({movie['rating']}/10) - {movie['year']} | Cast: {', '.join(actors[:3])}")
                 
                 except Exception as e:
                     logger.warning(f"Error parsing show: {e}")
