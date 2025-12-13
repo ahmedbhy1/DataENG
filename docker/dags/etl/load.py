@@ -179,6 +179,48 @@ def save_film_with_actors(film_data, actor_names):
         raise
 
 
+def save_reddit_comments(film_id, film_title, comments_with_sentiment):
+    """
+    Save Reddit comments with sentiment scores to the database.
+    
+    Args:
+        film_id: int - The film's database ID
+        film_title: str - The film title
+        comments_with_sentiment: list of dicts with {text, sentiment_score}
+    
+    Returns:
+        int - Number of comments saved
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        saved_count = 0
+        for comment_data in comments_with_sentiment:
+            comment_text = comment_data.get('text', '')
+            sentiment_score = comment_data.get('sentiment_score', 0)
+            comment_length = len(comment_text)
+            
+            cursor.execute('''
+                INSERT INTO reddit_comments (film_id, film_title, comment_text, comment_length, sentiment_score)
+                VALUES (%s, %s, %s, %s, %s)
+            ''', (film_id, film_title, comment_text, comment_length, sentiment_score))
+            
+            saved_count += 1
+        
+        conn.commit()
+        logger.info(f"✓ Saved {saved_count} comments for film: {film_title}")
+        return saved_count
+        
+    except Exception as e:
+        conn.rollback()
+        logger.error(f"❌ Error saving comments: {e}")
+        raise
+    finally:
+        cursor.close()
+        conn.close()
+
+
 def save_recommendation(recommendation):
     """Save recommendation (backwards compatibility)"""
     conn = get_db_connection()
