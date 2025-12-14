@@ -88,19 +88,6 @@ actor_ratings (90 rows) - Calculated
 ├── min_rating
 └── max_rating
 ```
-
-## Deleted Components
-
-**Removed Unused Tables:**
-- `recommendations` - No recommendation logic implemented
-- `dim_actor`, `dim_film`, `dim_date`, `dim_redditsource` - Empty dimension tables
-- `fact_filmsentiment` - Unused fact table
-- `reddit_comments` - Removed from storage (comments still analyzed)
-
-**Removed Functions:**
-- `save_reddit_comments()` - Comments analyzed but not persisted
-- `save_recommendation()` - Recommendation logic removed
-
 ## Setup & Execution
 
 ### Docker Deployment
