@@ -1,8 +1,10 @@
 # Movie Sentiment Analysis & Actor Ratings Pipeline
 
-![Insalogo](./images/insa.txt)
+![Insalogo](./images/logo-insa_0.png)
 
 Project [DATA Engineering](https://www.riccardotommasini.com/courses/dataeng-insa-ot/) is provided by [INSA Lyon](https://www.insa-lyon.fr/).
+
+Students: ** Sirine Souayah | Ahmed Bel Hadj Youssef | Madelena **
 
 ### Abstract
 
