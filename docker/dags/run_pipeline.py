@@ -1,7 +1,7 @@
 from etl.extract import get_latest_films
 from etl.reddit_extract import get_film_comments
 from etl.sentiment import rate_comments_with_details
-from etl.load import save_film, save_actor, save_recommendation, save_reddit_comments
+from etl.load import save_film, save_actor
 import logging
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
@@ -46,26 +46,11 @@ def run_pipeline():
             'year': film['year']
         })
         
-        # Save comments with sentiment scores
-        if comments_with_sentiment:
-            save_reddit_comments(film_id, title, comments_with_sentiment)
-        
+        # Save actors
         for actor in film.get('actors', []):
             save_actor(actor)
         
-        # Calculate score
-        imdb_score = (film['rating'] * 10) if film['rating'] else 0
-        rec_score = int(0.6 * imdb_score + 0.4 * reddit_score)
-        
-        save_recommendation({
-            'film_title': title,
-            'imdb_rating': film['rating'],
-            'reddit_score': reddit_score,
-            'recommendation_score': rec_score,
-            'comments_count': len(comments_with_sentiment)
-        })
-        
-        print(f"Score: {rec_score}/100 | Comments: {len(comments_with_sentiment)}")
+        print(f"Saved: {title} | Rating: {film['rating']}/10")
 
     print("\n" + "="*60)
     print("COMPLETED!")
