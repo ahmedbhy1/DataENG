@@ -1,0 +1,63 @@
+﻿services:
+  postgres:
+    image: postgres:15
+    container_name: imdb_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: imdb_reddit
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:7
+    container_name: imdb_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  airflow:
+    image: apache/airflow:2.7.2
+    container_name: imdb_airflow
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://postgres:postgres@postgres:5432/imdb_reddit
+      PYTHONPATH: /opt/airflow/dags
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: imdb_reddit
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+      - "5000:5000"
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./requirements.txt:/requirements.txt
+      - ./init.sql:/opt/airflow/init.sql
+    command: >
+      bash -c "
+        pip install --no-cache-dir -r /requirements.txt &&
+        airflow db upgrade &&
+        airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com 2>/dev/null || true &&
+        airflow standalone
+      "
+
+volumes:
+  postgres_data:

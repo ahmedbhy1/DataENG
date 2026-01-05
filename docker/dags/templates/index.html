@@ -1,0 +1,486 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trending 2025 Movies</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        
+        h1 {
+            color: #1e3c72;
+            margin-bottom: 10px;
+            font-size: 36px;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: #ff6b6b;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .recommendations {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            border-top: 4px solid #667eea;
+        }
+        
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+            border-top-color: #764ba2;
+        }
+        
+        .card h2 {
+            color: #1e3c72;
+            margin-bottom: 20px;
+            font-size: 24px;
+            line-height: 1.3;
+        }
+        
+        .rating {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .rating:last-of-type {
+            border-bottom: none;
+        }
+        
+        .rating-label {
+            color: #666;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .rating-value {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .score {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .score-value {
+            font-size: 42px;
+            font-weight: bold;
+        }
+        
+        .score-label {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        
+        .empty-state {
+            color: white;
+            text-align: center;
+            grid-column: 1/-1;
+            padding: 60px 20px;
+        }
+        
+        .empty-state p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        
+        .star {
+            color: #ffc107;
+            font-size: 18px;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            border-left: 4px solid #721c24;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            border-left: 4px solid #155724;
+        }
+        
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            padding: 30px;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .rank {
+            display: inline-block;
+            background: #ff6b6b;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 Trending 2025 Movies</h1>
+            <p class="subtitle">Real-time recommendations based on IMDb Ratings + Reddit Community Sentiment</p>
+            <span class="badge">LIVE DATA 2025</span>
+        </header>
+        
+        <div class="controls">
+            <button class="btn" onclick="runPipeline()" id="runBtn">🎯 Analyze Trending Movies</button>
+            <button class="btn" onclick="location.reload()">🔄 Refresh Data</button>
+        </div>
+        
+        <div id="successMsg" class="success"></div>
+        <div id="errorMsg" class="error"></div>
+        
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p style="margin-top: 15px;">Fetching trending movies and analyzing Reddit sentiment...</p>
+            <p style="font-size: 14px; opacity: 0.8;">This may take 2-3 minutes...</p>
+        </div>
+        
+        <div class="recommendations" id="recommendations">
+            {% if recommendations %}
+                {% for rec in recommendations %}
+                <div class="card">
+                    <h2>{{ rec.film_title }}</h2>
+                    <div class="rating">
+                        <span class="rating-label">IMDb Rating</span>
+                        <span class="rating-value">{{ "%.1f"|format(rec.imdb_rating) }}/10 <span class="star">⭐</span></span>
+                    </div>
+                    <div class="rating">
+                        <span class="rating-label">Reddit Sentiment</span>
+                        <span class="rating-value">{{ rec.reddit_score }}/100</span>
+                    </div>
+                    <div class="rating">
+                        <span class="rating-label">Comments Analyzed</span>
+                        <span class="rating-value">{{ rec.comments_count }}</span>
+                    </div>
+                    <div class="score">
+                        <div class="score-label">RECOMMENDATION SCORE</div>
+                        <div class="score-value">{{ rec.recommendation_score }}/100</div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <p>No trending movies analyzed yet</p>
+                    <p>Click "Analyze Trending Movies" to start</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <script>
+        function runPipeline() {
+            const btn = document.getElementById('runBtn');
+            const loading = document.getElementById('loading');
+            const errorMsg = document.getElementById('errorMsg');
+            const successMsg = document.getElementById('successMsg');
+            
+            btn.disabled = true;
+            loading.style.display = 'block';
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+            
+            fetch('/api/run-pipeline', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'}
+            })
+            .then(r => r.json())
+            .then(data => {
+                loading.style.display = 'none';
+                if (data.status === 'success') {
+                    successMsg.textContent = '✓ ' + data.message;
+                    successMsg.style.display = 'block';
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    errorMsg.textContent = '✗ Error: ' + data.message;
+                    errorMsg.style.display = 'block';
+                    btn.disabled = false;
+                }
+            })
+            .catch(e => {
+                loading.style.display = 'none';
+                errorMsg.textContent = '✗ Error: ' + e.message;
+                errorMsg.style.display = 'block';
+                btn.disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>
+
+        }
+        
+        .rating {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .rating-label {
+            color: #666;
+            font-weight: bold;
+        }
+        
+        .rating-value {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .score {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .score-value {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        
+        .score-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .star {
+            color: #ffc107;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1> Movie Recommendation System</h1>
+            <p class="subtitle">Powered by IMDb Ratings + Reddit Sentiment Analysis</p>
+        </header>
+        
+        <div class="controls">
+            <button class="btn" onclick="runPipeline()" id="runBtn"> Run Pipeline</button>
+            <button class="btn" onclick="location.reload()"> Refresh Data</button>
+        </div>
+        
+        <div id="successMsg" class="success"></div>
+        <div id="errorMsg" class="error"></div>
+        
+        <div id="loading" class="loading" style="display: none;">
+             Running pipeline... This may take a minute...
+        </div>
+        
+        <div class="recommendations" id="recommendations">
+            {% if recommendations %}
+                {% for rec in recommendations %}
+                <div class="card">
+                    <h2>{{ rec.film_title }}</h2>
+                    <div class="rating">
+                        <span class="rating-label">IMDb Rating:</span>
+                        <span class="rating-value">{{ rec.imdb_rating }}/10 <span class="star"></span></span>
+                    </div>
+                    <div class="rating">
+                        <span class="rating-label">Reddit Score:</span>
+                        <span class="rating-value">{{ rec.reddit_score }}/100</span>
+                    </div>
+                    <div class="rating">
+                        <span class="rating-label">Comments:</span>
+                        <span class="rating-value">{{ rec.comments_count }}</span>
+                    </div>
+                    <div class="score">
+                        <div class="score-label">RECOMMENDATION SCORE</div>
+                        <div class="score-value">{{ rec.recommendation_score }}/100</div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p style="color: white; text-align: center; grid-column: 1/-1;">No recommendations yet. Click "Run Pipeline" to start!</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <script>
+        function runPipeline() {
+            const btn = document.getElementById('runBtn');
+            const loading = document.getElementById('loading');
+            const errorMsg = document.getElementById('errorMsg');
+            const successMsg = document.getElementById('successMsg');
+            
+            btn.disabled = true;
+            loading.style.display = 'block';
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+            
+            fetch('/api/run-pipeline', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'}
+            })
+            .then(r => r.json())
+            .then(data => {
+                loading.style.display = 'none';
+                if (data.status === 'success') {
+                    successMsg.textContent = ' ' + data.message;
+                    successMsg.style.display = 'block';
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    errorMsg.textContent = ' Error: ' + data.message;
+                    errorMsg.style.display = 'block';
+                }
+            })
+            .catch(e => {
+                loading.style.display = 'none';
+                errorMsg.textContent = ' Error: ' + e.message;
+                errorMsg.style.display = 'block';
+                btn.disabled = false;
+            });
+        }
+    </script>
+</body>
+</html>
