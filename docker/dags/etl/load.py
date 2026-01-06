@@ -179,27 +179,4 @@ def save_film_with_actors(film_data, actor_names):
         raise
 
 
-def save_recommendation(recommendation):
-    """Save recommendation (backwards compatibility)"""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    try:
-        cursor.execute('''
-            INSERT INTO recommendations (film_title, imdb_rating, reddit_score, recommendation_score, comments_count)
-            VALUES (%s, %s, %s, %s, %s)
-        ''', (recommendation.get('film_title'), recommendation.get('imdb_rating'), 
-              recommendation.get('reddit_score'), recommendation.get('recommendation_score'),
-              recommendation.get('comments_count')))
-        
-        conn.commit()
-        logger.info(f"✓ Saved recommendation: {recommendation['film_title']}")
-        return True
-        
-    except Exception as e:
-        conn.rollback()
-        logger.error(f"❌ Error saving recommendation: {e}")
-        raise
-    finally:
-        cursor.close()
-        conn.close()
+# Removed: save_reddit_comments and save_recommendation functions (tables no longer used)
