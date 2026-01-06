@@ -4,7 +4,7 @@
 
 Project [DATA Engineering](https://www.riccardotommasini.com/courses/dataeng-insa-ot/) is provided by [INSA Lyon](https://www.insa-lyon.fr/).
 
-Students: ** Sirine Souayah | Ahmed Bel Hadj Youssef | Madelena **
+Students: ** Sirine Souayah | Ahmed Bel Hadj Youssef | Madalina Avornicita **
 
 ### Abstract
 
