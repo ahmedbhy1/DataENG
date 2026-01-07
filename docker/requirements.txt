@@ -1,6 +1,7 @@
 ﻿imdbpy==2022.7.9
 praw==7.7.0
 pandas==1.5.3
+numpy==1.24.4
 sqlalchemy==1.4.48
 psycopg2-binary==2.9.9
 python-dotenv==1.0.0

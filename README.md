@@ -100,7 +100,7 @@ Services Started:
 - PostgreSQL on `localhost:5432`
 - pgAdmin on `localhost:5050`
 - Apache Airflow on `localhost:8080`
-- Flask app on `localhost:5000`
+- Flask app on `localhost:5001`
 
 ### Run Pipeline
 ```bash

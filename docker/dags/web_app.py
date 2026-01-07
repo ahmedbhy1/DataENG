@@ -6,6 +6,7 @@ import logging
 from sqlalchemy import create_engine
 from config import DATABASE_URL
 import pandas as pd
+import os
 
 app = Flask(__name__)
 logger = logging.getLogger(__name__)
@@ -131,4 +132,6 @@ def get_stats():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    port = int(os.getenv('PORT', '5000'))
+    app.run(debug=True, host='0.0.0.0', port=port)
+

@@ -51,13 +51,32 @@
       - ./dags:/opt/airflow/dags
       - ./requirements.txt:/requirements.txt
       - ./init.sql:/opt/airflow/init.sql
-    command: >
+    command:
       bash -c "
         pip install --no-cache-dir -r /requirements.txt &&
         airflow db upgrade &&
         airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com 2>/dev/null || true &&
         airflow standalone
       "
+
+  webserver:
+    build:
+      context: .
+      dockerfile: Dockerfile.webapp
+    container_name: imdb_webserver
+    environment:
+      DATABASE_URL: postgresql+psycopg2://postgres:postgres@postgres:5432/imdb_reddit
+      PYTHONPATH: /app/dags
+    ports:
+      - "5001:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./dags:/app/dags
+      - ./requirements.txt:/requirements.txt
+      - ./init.sql:/app/init.sql
+
 
 volumes:
   postgres_data:
